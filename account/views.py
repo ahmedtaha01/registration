@@ -32,7 +32,7 @@ def register(request):
         form = RegisterForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
-            user.is_active = False
+            user.activation = False
             user.save()
             ###################
             form.cleaned_data.get('username')
