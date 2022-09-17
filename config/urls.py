@@ -20,6 +20,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from account.views import register , activate , signin
 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('oauth/', include('social_django.urls', namespace='social')),
@@ -28,5 +29,5 @@ urlpatterns = [
     path('register/',register, name='register'),
     path('activate/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/',
         activate, name='activate'),
-    path('login/', signin, name='login'),    
+    path('login/', signin, name='login'),
 ] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)

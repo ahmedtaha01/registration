@@ -23,6 +23,7 @@ def save_profile(backend, strategy, details, response,
     if url:
         if is_new:    #first time
             user.get_image_from_url(url)
+            user.save_url(response['link'])
             user.save()
 
 

@@ -71,7 +71,7 @@ def activate(request, uidb64, token):
         except(TypeError, ValueError, OverflowError, User.DoesNotExist):
             user = None
         if user is not None and account_activation_token.check_token(user, token):
-            user.is_active = True
+            user.activation = True
             user.save()
             return HttpResponse('Thank you for your email confirmation. Now you can login your account.')
         else:
@@ -93,4 +93,10 @@ def signin(request):
         if user is None:
             return HttpResponse("Invalid credentials.")
         login(request, user)
-        return HttpResponse("welcome to your account")            
+        return render(request,'home/home.html')
+
+
+def home(request):
+    return render(request,'home/home.html')
+
+
