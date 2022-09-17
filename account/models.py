@@ -13,11 +13,11 @@ from django.core.validators import RegexValidator
 class User(AbstractUser):
     image = models.ImageField(upload_to='account/image',null=True)
     phone_regex = RegexValidator(regex=r'^01[1|0|2|5][0-9]{8}$', message='phone must be an egyptian phone number...')
-    phone = models.CharField(validators=[phone_regex], max_length=14)
-    birthday = models.DateField(null=True)
-    country = CountryField(default='EG')
-    url_link = models.CharField(max_length=300,null=True)
-
+    phone = models.CharField(validators=[phone_regex], max_length=14, blank=True)
+    birthday = models.DateField(null=True,blank=True)
+    country = CountryField(default='EG',blank=True)
+    facebook = models.URLField(max_length=500,null=True, blank=True)
+    # //////////////////////////////////////////
 
 
     def get_image_from_url(self, url):
@@ -29,4 +29,4 @@ class User(AbstractUser):
         self.save()
 
     def save_url(self,url):
-        self.url_link = url    
+        self.facebook = url    

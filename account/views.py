@@ -1,8 +1,9 @@
+from urllib import request
 from django.shortcuts import render , redirect
 from django.http import HttpResponse
 from django.contrib import messages
 from .forms import RegisterForm
-from django.core.mail import EmailMessage
+from django.core.mail import EmailMessage ,send_mail, BadHeaderError
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.template.loader import render_to_string
 from django.contrib.sites.shortcuts import get_current_site
@@ -13,6 +14,10 @@ from .tokens import account_activation_token
 from .models import User
 from .forms import UserForm
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.forms import PasswordResetForm
+from django.db.models.query_utils import Q
+from django.contrib.auth.tokens import default_token_generator
+
 
 # Create your views here.
 
@@ -45,7 +50,7 @@ def register(request):
                     'uid': urlsafe_base64_encode(force_bytes(user.pk)),
                     'token': account_activation_token.make_token(user),
                 }
-                )
+            )
             to_email = form.cleaned_data.get('email')
             email = EmailMessage(
                 mail_subject, message, to=[to_email]
@@ -100,3 +105,32 @@ def home(request):
     return render(request,'home/home.html')
 
 
+def password_reset_request(request):
+    if request.method == 'POST':
+        password_reset_form = PasswordResetForm(request.POST)
+        if password_reset_form.is_valid():
+            data = password_reset_form.cleaned_data['email']
+            associated_users = User.objects.filter(Q(email=data))
+            if associated_users.exists():
+                for user in associated_users:
+                    current_site = get_current_site(request)
+                    email_template_name = "password/password_reset_email.html"
+                    mail_subject = 'Activation link has been sent to your email id'
+                    message = render_to_string(
+                        email_template_name, {
+                            'user': user,
+                            'domain': current_site.domain,
+                            'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+                            'token': default_token_generator.make_token(user),
+                            'email':user.email,
+                            'site_name': 'Website',
+                        }
+                    )
+                    email = EmailMessage(
+                        mail_subject, message, to=[user.email]
+                    )
+                    email.send()
+                    return redirect ("/password_reset/done/")
+    password_reset_form = PasswordResetForm()
+    return render(request=request, template_name="password/password_reset.html", context={"password_reset_form":password_reset_form})                    
+                        
