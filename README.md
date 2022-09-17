@@ -11,6 +11,8 @@ add :
   
   4 - "pip install psycopg2"
   
+  5 - "pip install django-six"
+  
   python manage.py makemigrations
   
   python manage.py migrate
