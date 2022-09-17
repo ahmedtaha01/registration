@@ -32,7 +32,7 @@ def register(request):
         form = RegisterForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
-            user.activation = False
+            user.is_active = False
             user.save()
             ###################
             form.cleaned_data.get('username')
@@ -71,7 +71,7 @@ def activate(request, uidb64, token):
         except(TypeError, ValueError, OverflowError, User.DoesNotExist):
             user = None
         if user is not None and account_activation_token.check_token(user, token):
-            user.activation = True
+            user.is_active = True
             user.save()
             return HttpResponse('Thank you for your email confirmation. Now you can login your account.')
         else:
